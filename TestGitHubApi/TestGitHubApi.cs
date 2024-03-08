@@ -14,8 +14,8 @@ namespace TestGitHubApi
     {
         private GitHubApiClient _client;
         private static string _repo;
-        private static int _lastCreatedIssueNumber;
-        private static int _lastCreatedCommentId;
+        private static long _lastCreatedIssueNumber;
+        private static long _lastCreatedCommentId;
 
         [SetUp]
         public void Setup()
@@ -132,33 +132,108 @@ namespace TestGitHubApi
         [Test, Order(5)]
         public void Test_CreateGitHubIssue()
         {
-            
+
+            //Arrange
+
+            string title = "Attack!!!";
+            string body = "Body In The Mix!!!!!!";
+
+            //Act
+            var issue = _client.CreateIssue(_repo, title, body);
+
+            //Assert
+
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(issue);
+                Assert.Greater(issue.Id, 0);
+                Assert.Greater(issue.Number, 0);
+                Assert.IsNotEmpty(issue.Title);
+                Assert.IsNotEmpty(issue.Body);
+                Assert.AreEqual(title, issue.Title);
+                Assert.AreEqual(body, issue.Body);
+            }
+            );
+
+
+            _lastCreatedIssueNumber = issue.Number;
+            Console.WriteLine(_lastCreatedIssueNumber);
         }
 
         [Test, Order (6)]
         public void Test_CreateCommentOnGitHubIssue()
         {
-           
+            //Arrange
 
-         }
+            string body = "Comment In The Mix!!!!!!";
+
+            int issueNumber = 5263;
+            //Act
+            var comment = _client.CreateCommentOnGitHubIssue(_repo, issueNumber, body);
+
+            //Assert 
+            Assert.NotNull(comment);
+            Assert.AreEqual(body, comment.Body);
+
+            _lastCreatedCommentId = comment.Id;
+            Console.WriteLine(_lastCreatedCommentId);
+        }
 
         [Test, Order (7)]
         public void Test_GetCommentById()
         {
-            
+            //1986544186
+
+            //Arrange
+            int commentId = 1986544186;
+
+
+            //Act
+            var comment = _client.GetCommentById(_repo, commentId);
+
+            //Assert 
+            Assert.AreEqual(comment.Id, commentId);
+            Assert.NotNull(comment);
+            Assert.IsNotEmpty(comment.Body);
+
+
         }
 
 
         [Test, Order (8)]
         public void Test_EditCommentOnGitHubIssue()
         {
-           
+
+            //Arrange
+            int commentId = 1986544186;
+            string updatedBody = "in the mix !!!!!! in the mix !!!!!! ";
+
+            //Act
+            var updatedComment = _client.EditCommentOnGitHubIssue(_repo, commentId, updatedBody);
+
+            //Assert 
+            Assert.NotNull(updatedComment);
+            Assert.IsNotEmpty(updatedComment.Body);
+            Assert.AreEqual(updatedComment.Id, commentId);
+            Assert.AreEqual(updatedBody, updatedComment.Body);
         }
 
         [Test, Order (9)]
         public void Test_DeleteCommentOnGitHubIssue()
         {
+            //1986547538
+
+            //Arrange
+            int commentId = 1986551012;
            
+
+            //Act
+            var deletedComment = _client.DeleteCommentOnGitHubIssue(_repo, commentId);
+
+            //Assert 
+
+            Assert.True(deletedComment);
+
         }
 
 
